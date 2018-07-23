@@ -1,0 +1,24 @@
+{
+    "name": "raphaelbsr/yii2-billing",
+    "description": "Billing",
+    "type": "yii2-extension",
+    "keywords": ["yii2", "extension", "gii", "billing"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rahael Barbosa",
+            "email": "raphaelbsr@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "~2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "raphaelbsr\\billing\\": "src/"
+        }
+    },
+    "ignore": [
+        ".github"
+    ]
+}
