@@ -57,6 +57,8 @@ class Cielo extends Billing {
      * @link https://developercielo.github.io/manual/cielo-ecommerce#transa%C3%A7%C3%A3o-simples
      * @param OrderRequest $orderRequest
      * @return string|OrderResponse
+     * @throws \RuntimeException
+     * @throws OrderRequestException
      */
     public function postOrderRequest(OrderRequest $orderRequest) {
 
@@ -71,14 +73,16 @@ class Cielo extends Billing {
                 ->setContent(json_encode($orderRequest->getAttributes()))
                 ->setFormat(Client::FORMAT_JSON)
                 ->send();
-        
-        return new OrderResponse(json_decode($this->readResponse($response), true));        
+
+        return new OrderResponse(json_decode($this->readResponse($response), true));
     }
 
     /**
      * @link https://developercielo.github.io/manual/cielo-ecommerce#consulta-paymentid
      * @param string $paymentId
      * @return string|OrderResponse
+     * @throws \RuntimeException
+     * @throws OrderRequestException
      */
     public function queryOrderRequest($paymentId) {
 
@@ -94,16 +98,15 @@ class Cielo extends Billing {
                 ->setFormat(Client::FORMAT_JSON)
                 ->send();
 
-        $r = $this->readResponse($response);
-        
-        //return new OrderResponse($this->readResponse($response));
-        
+        return new OrderResponse($this->readResponse($response));
     }
 
     /**
      * @link https://developercielo.github.io/manual/cielo-ecommerce#consulta-merchandorderid
      * @param string $merchandOrderId
      * @return mixed
+     * @throws \RuntimeException
+     * @throws OrderRequestException
      */
     public function queryORByMerchantOrderId($merchandOrderId) {
 
@@ -117,20 +120,16 @@ class Cielo extends Billing {
                 ->setUrl($url)
                 ->setFormat(Client::FORMAT_JSON)
                 ->send();
-        die($response->getContent());
-        switch ($response->getStatusCode()) {
-            case 200:
-            case 201:
-                return $response->getContent();
-            case 400:
-                return 'TODO HANDLER ERROR';
-        }
+
+        return $this->readResponse($response);
     }
 
     /**
      * @link https://developercielo.github.io/manual/cielo-ecommerce#cancelamento-total
      * @param type $paymentId
      * @return string
+     * @throws \RuntimeException
+     * @throws OrderRequestException
      */
     public function cancelOrderByPaymentId($paymentId) {
         $url = $this->getApiUrl() . '/' . self::$API_VERSION . '/sales/' . $paymentId . '/void';
@@ -144,7 +143,7 @@ class Cielo extends Billing {
                 ->setUrl($url)
                 ->setFormat(Client::FORMAT_JSON)
                 ->send();
-        
+
         return $this->readResponse($response);
     }
 
@@ -152,6 +151,8 @@ class Cielo extends Billing {
      * @link https://developercielo.github.io/manual/cielo-ecommerce#cancelamento-total
      * @param type $merchantOrderId
      * @return string
+     * @throws \RuntimeException
+     * @throws OrderRequestException
      */
     public function cancelOrderByMerchantOrderId($merchantOrderId) {
         $url = $this->getApiUrl() . '/' . self::$API_VERSION . '/sales/OrderId/' . $merchantOrderId . '/void';
@@ -165,20 +166,16 @@ class Cielo extends Billing {
                 ->setUrl($url)
                 ->setFormat(Client::FORMAT_JSON)
                 ->send();
-        die($response->getContent());
-        switch ($response->getStatusCode()) {
-            case 200:
-            case 201:
-                return $response->getContent();
-            case 400:
-                return 'TODO HANDLER ERROR';
-        }
+
+        return $this->readResponse($response);
     }
 
     /**
      * @link https://developercielo.github.io/manual/cielo-ecommerce#criando-um-cart%C3%A3o-tokenizado
      * @param CreditCard $creditCard
      * @return string
+     * @throws \RuntimeException
+     * @throws OrderRequestException
      */
     public function tokenizeCreditCard(CreditCard $creditCard) {
 
@@ -192,36 +189,30 @@ class Cielo extends Billing {
                 ->setContent(json_encode($creditCard->getAttributes()))
                 ->setUrl($url)
                 ->setFormat(Client::FORMAT_JSON)
-                ->send();        
-        switch ($response->getStatusCode()) {
-            case 200:
-            case 201:
-                return $response->getContent();
-            case 400:
-                return 'TODO HANDLER ERROR';
-        }
+                ->send();
+        return $this->readResponse($response);
     }
 
     protected function readResponse(Response $response) {
-        
-        $statusCode = $response->getStatusCode();        
+
+        $statusCode = $response->getStatusCode();
         switch ($statusCode) {
             case 200:
             case 201:
                 return $response->getContent();
             case 400:
-                $exception = null;                
-                $responses = json_decode($response->getContent());                
-                foreach ($responses as $error) {     
+                $exception = null;
+                $responses = json_decode($response->getContent());
+                foreach ($responses as $error) {
                     $cieloError = new CieloError($error->Message, $error->Code);
-                    $exception = new OrderRequestException('Request Error '.$response->getContent(), $statusCode, $exception);
+                    $exception = new OrderRequestException('Request Error ' . $response->getContent(), $statusCode, $exception);
                     $exception->setCieloError($cieloError);
-                }                
+                }
                 throw $exception;
             case 404:
-                throw new OrderRequestException('Resource not found', 404, null);
+                throw new \RuntimeException('Resource not found', 404, null);
             default:
-                throw new OrderRequestException('Unknown status', $statusCode);
+                throw new \RuntimeException('Unknown status', $statusCode);
         }
     }
 
