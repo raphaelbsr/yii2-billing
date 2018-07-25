@@ -7,7 +7,7 @@ namespace raphaelbsr\billing\models;
  *
  * @author rapha
  */
-class Address extends \yii\base\Model {
+class Address extends AbstractModel {
 
     public $Street;
     public $Number;

@@ -63,7 +63,9 @@ class Cielo extends Billing {
      * @throws OrderRequestException
      */
     public function postOrderRequest(OrderRequest $orderRequest) {
-
+//return json_encode($orderRequest->getAttributes());
+//        print_r($orderRequest->getAttributes());
+//        die();
         $url = $this->getApiUrl() . '/' . self::$API_VERSION . '/sales';
         $client = new Client();
         $response = $client->createRequest()
@@ -236,7 +238,7 @@ class Cielo extends Billing {
             case 404:
                 throw new RuntimeException('Resource not found', 404, null);
             default:
-                throw new RuntimeException('Unknown status', $statusCode);
+                throw new RuntimeException('Unknown status ' . $response->getContent(), $statusCode);
         }
     }
 

@@ -9,7 +9,7 @@ use yii\base\Model;
  *
  * @author rapha
  */
-class CreditCard extends Model{
+class CreditCard extends AbstractModel{
     
     public $CustomerName;
     public $CardNumber;

@@ -9,14 +9,14 @@ use yii\base\Model;
  *
  * @author rapha
  */
-class Customer extends Model {
-    
+class Customer extends AbstractModel {
+
     public $Name;
     public $Address;
-    
+
     public function init() {
         parent::init();
-        $this->Address = new Address($this->Address);
+        $this->Address = (new Address($this->Address))->getAttributes();
     }
-    
+
 }

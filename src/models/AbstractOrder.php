@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace raphaelbsr\billing\models;
 
 /**
@@ -9,10 +7,10 @@ namespace raphaelbsr\billing\models;
  *
  * @author rapha
  */
-abstract  class AbstractOrder extends \yii\base\Model{
-    
+abstract class AbstractOrder extends AbstractModel {
+
     public $MerchantOrderId;
     public $Payment;
     public $Customer;
-    
+
 }

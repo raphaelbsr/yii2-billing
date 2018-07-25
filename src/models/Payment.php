@@ -9,11 +9,11 @@ use yii\base\Model;
  *
  * @author rapha
  */
-class Payment extends Model {
+class Payment extends AbstractModel {
 
     public function init() {
         parent::init();
-        $this->CreditCard = new CreditCard($this->CreditCard);
+        $this->CreditCard = (new CreditCard($this->CreditCard))->getAttributes();
     }
 
     const PAYMENTTYPE_CREDITCARD = 'CreditCard';
@@ -49,5 +49,6 @@ class Payment extends Model {
     public $Authenticate;
     public $VoidedAmount;
     public $VoidedDate;
+
 
 }
