@@ -3,10 +3,12 @@
 namespace raphaelbsr\billing;
 
 use raphaelbsr\billing\exceptions\OrderRequestException;
+use raphaelbsr\billing\models\CardBin;
 use raphaelbsr\billing\models\CieloError;
 use raphaelbsr\billing\models\CreditCard;
 use raphaelbsr\billing\models\OrderRequest;
 use raphaelbsr\billing\models\OrderResponse;
+use RuntimeException;
 use yii\httpclient\Client;
 use yii\httpclient\Response;
 
@@ -57,7 +59,7 @@ class Cielo extends Billing {
      * @link https://developercielo.github.io/manual/cielo-ecommerce#transa%C3%A7%C3%A3o-simples
      * @param OrderRequest $orderRequest
      * @return string|OrderResponse
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws OrderRequestException
      */
     public function postOrderRequest(OrderRequest $orderRequest) {
@@ -81,7 +83,7 @@ class Cielo extends Billing {
      * @link https://developercielo.github.io/manual/cielo-ecommerce#consulta-paymentid
      * @param string $paymentId
      * @return string|OrderResponse
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws OrderRequestException
      */
     public function queryOrderRequest($paymentId) {
@@ -105,7 +107,7 @@ class Cielo extends Billing {
      * @link https://developercielo.github.io/manual/cielo-ecommerce#consulta-merchandorderid
      * @param string $merchandOrderId
      * @return mixed
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws OrderRequestException
      */
     public function queryORByMerchantOrderId($merchandOrderId) {
@@ -128,7 +130,7 @@ class Cielo extends Billing {
      * @link https://developercielo.github.io/manual/cielo-ecommerce#cancelamento-total
      * @param type $paymentId
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws OrderRequestException
      */
     public function cancelOrderByPaymentId($paymentId) {
@@ -151,7 +153,7 @@ class Cielo extends Billing {
      * @link https://developercielo.github.io/manual/cielo-ecommerce#cancelamento-total
      * @param type $merchantOrderId
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws OrderRequestException
      */
     public function cancelOrderByMerchantOrderId($merchantOrderId) {
@@ -174,7 +176,7 @@ class Cielo extends Billing {
      * @link https://developercielo.github.io/manual/cielo-ecommerce#criando-um-cart%C3%A3o-tokenizado
      * @param CreditCard $creditCard
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws OrderRequestException
      */
     public function tokenizeCreditCard(CreditCard $creditCard) {
@@ -191,6 +193,28 @@ class Cielo extends Billing {
                 ->setFormat(Client::FORMAT_JSON)
                 ->send();
         return $this->readResponse($response);
+    }
+
+    /**
+     * @link https://developercielo.github.io/manual/cielo-ecommerce#consulta-bin
+     * @param string bin
+     * @return mixed
+     * @throws RuntimeException
+     * @throws OrderRequestException
+     */
+    public function cardBin($bin) {
+
+        $url = $this->getApiQueryUrl() . '/' . self::$API_VERSION . '/cardBin/' . $bin;
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('GET')
+                ->addHeaders(['MerchantId' => $this->merchantId])
+                ->addHeaders(['MerchantKey' => $this->merchantKey])
+                ->addHeaders(['content-type' => 'application/json'])
+                ->setUrl($url)
+                ->setFormat(Client::FORMAT_JSON)
+                ->send();
+        return new CardBin(json_decode($this->readResponse($response), true));
     }
 
     protected function readResponse(Response $response) {
@@ -210,9 +234,9 @@ class Cielo extends Billing {
                 }
                 throw $exception;
             case 404:
-                throw new \RuntimeException('Resource not found', 404, null);
+                throw new RuntimeException('Resource not found', 404, null);
             default:
-                throw new \RuntimeException('Unknown status', $statusCode);
+                throw new RuntimeException('Unknown status', $statusCode);
         }
     }
 
