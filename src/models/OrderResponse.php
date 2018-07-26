@@ -11,7 +11,7 @@ class OrderResponse extends AbstractOrder {
 
     public function init() {
         parent::init();
-        $this->Payment = (new Payment($this->Payment))->getAttributes();
-        $this->Customer = (new Customer($this->Customer))->getAttributes();
+        $this->Payment = (new Payment($this->Payment));
+        $this->Customer = (new Customer($this->Customer));
     }
 }

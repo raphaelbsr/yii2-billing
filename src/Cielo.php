@@ -63,9 +63,7 @@ class Cielo extends Billing {
      * @throws OrderRequestException
      */
     public function postOrderRequest(OrderRequest $orderRequest) {
-//return json_encode($orderRequest->getAttributes());
-//        print_r($orderRequest->getAttributes());
-//        die();
+
         $url = $this->getApiUrl() . '/' . self::$API_VERSION . '/sales';
         $client = new Client();
         $response = $client->createRequest()

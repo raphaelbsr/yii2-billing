@@ -23,14 +23,27 @@ class Payment extends AbstractModel {
     const PROVIDER_BRADESCO = 'Bradesco';
     const PROVIDER_BANCO_DO_BRASIL = 'BancoDoBrasil';
     const PROVIDER_SIMULADO = 'Simulado';
+    const TRANSACTION_STATUS = [
+        0 => "Aguardando atualização de status",
+        1 => "Pagamento apto a ser capturado ou definido como pago",
+        2 => "Pagamento confirmado e finalizado",
+        3 => "Pagamento negado por Autorizador",
+        10 => "Pagamento cancelado",
+        11 => "Pagamento cancelado após 23:59 do dia de autorização",
+        12 => "Aguardando Status de instituição financeira",
+        13 => "Pagamento cancelado por falha no processamento ou por ação do AF",
+        20 => "Recorrência agendada",
+    ];
 
     public $Type;
     public $Amount;
     public $Installments = 1;
     public $SoftDescriptor;
     public $CreditCard;
-    public $Capture = false;
+    public $Capture = true;
     public $Recurrent = false;
+    public $CapturedAmount;
+    public $CapturedDate;
     public $Tid;
     public $ProofOfSale;
     public $AuthorizationCode;
@@ -49,6 +62,5 @@ class Payment extends AbstractModel {
     public $Authenticate;
     public $VoidedAmount;
     public $VoidedDate;
-
 
 }
