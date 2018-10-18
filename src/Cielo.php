@@ -63,7 +63,6 @@ class Cielo extends Billing {
      * @throws OrderRequestException
      */
     public function postOrderRequest(OrderRequest $orderRequest) {
-
         $url = $this->getApiUrl() . '/' . self::$API_VERSION . '/sales';
         $client = new Client();
         $response = $client->createRequest()
@@ -100,9 +99,11 @@ class Cielo extends Billing {
                 ->setFormat(Client::FORMAT_JSON)
                 ->send();
 
-        return new OrderResponse($this->readResponse($response));
+        return $this->readResponse($response);
+        
+//        return new OrderResponse($this->readResponse($response));
     }
-
+    
     /**
      * @link https://developercielo.github.io/manual/cielo-ecommerce#consulta-merchandorderid
      * @param string $merchandOrderId
@@ -148,7 +149,8 @@ class Cielo extends Billing {
 
         return $this->readResponse($response);
     }
-
+    
+   
     /**
      * @link https://developercielo.github.io/manual/cielo-ecommerce#cancelamento-total
      * @param type $merchantOrderId
@@ -172,6 +174,33 @@ class Cielo extends Billing {
         return $this->readResponse($response);
     }
 
+    /**
+     * @link https://developercielo.github.io/manual/cielo-ecommerce#captura
+     * @param string $paymentId
+     * @return string|OrderResponse
+     * @throws RuntimeException
+     * @throws OrderRequestException
+     */
+    public function capture($paymentId) {
+        $url = $this->getApiUrl() . '/' . self::$API_VERSION . '/sales/' . $paymentId . '/capture';
+//        die($url);
+        $client = new Client();
+        $response = $client->createRequest()
+                ->setMethod('PUT')
+                ->addHeaders(['MerchantId' => $this->merchantId])
+                ->addHeaders(['MerchantKey' => $this->merchantKey])
+                ->addHeaders(['content-type' => 'application/json'])
+                ->addHeaders(['Content-Length' => 0])
+                ->setUrl($url)
+                ->setFormat(Client::FORMAT_JSON)
+                ->send();
+        
+        return $this->readResponse($response);
+        
+//        return $response->getContent();
+//        return new OrderResponse($this->readResponse($response));
+    }
+    
     /**
      * @link https://developercielo.github.io/manual/cielo-ecommerce#criando-um-cart%C3%A3o-tokenizado
      * @param CreditCard $creditCard

@@ -40,6 +40,7 @@ class Payment extends AbstractModel {
     public $Installments = 1;
     public $SoftDescriptor;
     public $CreditCard;
+    public $Eci;
     public $Capture = true;
     public $Recurrent = false;
     public $CapturedAmount;
